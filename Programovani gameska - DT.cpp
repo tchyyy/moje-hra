@@ -115,7 +115,7 @@ int main() {
                     zivotM2 -= utok;
                     cout << "Utocis na monstrum 2. Zivoty: " << max(0, zivotM2) << endl;
                 } else {
-                    cout << "Ty chces zabijet neco co si zabil?. :D" << endl;
+                    cout << "Ty chces zabijet neco co si zabil? :D" << endl;
                     continue;
                 }
 
@@ -140,7 +140,7 @@ int main() {
         } else if (aktualni == "3xM") {
             int zivotM1 = 3, zivotM2 = 3, zivotM3 = 3;
             while ((zivotM1 > 0 || zivotM2 > 0 || zivotM3 > 0) && zivoty > 0) {
-                cout << "Vyber monstrum do kteryho pujdes (1, 2 nebo 3): ";
+                cout << "Vyber monstrum (1, 2 nebo 3): ";
                 int volba;
                 cin >> volba;
 
@@ -154,7 +154,7 @@ int main() {
                     zivotM3 -= utok;
                     cout << "Utocis na monstrum 3. Zivoty: " << max(0, zivotM3) << endl;
                 } else {
-                    cout << "Ty chces zabijet neco co si zabil?. :D" << endl;
+                    cout << "Ty chces zabijet neco co si zabil? :D" << endl;
                     continue;
                 }
 
