@@ -6,8 +6,10 @@ using namespace std;
 int main() {
     srand(time(0));
 
+    int M, x2M, x3M, MB, HB, V;
     int maxZivoty = 0, zivoty = 0, maxMana = 0, mana = 0, utok = 0;
     int zlato = 0, level = 1, zkusenosti = 0;
+    int pocetSouboju = 0;
     bool Uhyb = false;
 
     string herniJmeno;
@@ -50,14 +52,13 @@ int main() {
     }
 
     cout << "Vitej ve hre, " << herniJmeno << "!" << endl;
+    cout << "Priprav se, budes bojovat!" << endl;
 
-    string moznaMonstra[] = {"M", "2xM", "M"};
-    int bojovyPocet = 0;
-    const int maxBojov = 50;
+    string typyPostav[] = {"M", "2xM", "M", "2xM", "M"};
 
-    while (bojovyPocet < maxBojov) {
-        for (int i = 0; i < 5 && bojovyPocet < maxBojov; ++i) {
-            string aktualni = moznaMonstra[rand() % 3];
+    while (true) {
+        for (int i = 0; i < 5; i++) {
+            string aktualni = typyPostav[i % 5];
             cout << endl << "Setkal jsi se s: " << aktualni << endl;
 
             if (aktualni == "M") {
@@ -69,12 +70,26 @@ int main() {
                     if (zivotMonstra <= 0) {
                         cout << "Zabil si monstrum! +5 zlata" << endl;
                         zlato += 5;
+                        pocetSouboju++;
+                        cout << "Absolvoval jsi " << pocetSouboju << " souboju." << endl;
                         break;
                     }
 
                     bool zasah = true;
-                    if (Uhyb && rand() % 2 == 0) {
-                        cout << "Vyhnul ses utoku!" << endl;
+
+                    int volbaUh = 0;
+                    if (mana >= 3) {
+                        cout << "Chces pouzit 3 many na vyhnuti se utoku? (1 = ano, 0 = ne): ";
+                        cin >> volbaUh;
+                        if (volbaUh == 1) {
+                            mana -= 3;
+                            zasah = false;
+                            cout << "Pouzil jsi 3 many a vyhnul se utoku!" << endl;
+                        }
+                    }
+
+                    if (zasah && Uhyb && rand() % 2 == 0) {
+                        cout << "Pasivne ses vyhnul utoku!" << endl;
                         zasah = false;
                     }
 
@@ -111,17 +126,31 @@ int main() {
                         continue;
                     }
 
-                    if (zivotM1 > 0) {
-                        if (!(Uhyb && rand() % 2 == 0)) {
-                            cout << "Monstrum 1 te zasahuje." << endl;
-                            zivoty--;
-                        } else cout << "Vyhnul ses utoku monstra 1!" << endl;
-                    }
-                    if (zivotM2 > 0) {
-                        if (!(Uhyb && rand() % 2 == 0)) {
-                            cout << "Monstrum 2 te zasahuje." << endl;
-                            zivoty--;
-                        } else cout << "Vyhnul ses utoku monstra 2!" << endl;
+                    for (int j = 1; j <= 2; j++) {
+                        if ((j == 1 && zivotM1 > 0) || (j == 2 && zivotM2 > 0)) {
+                            bool zasah = true;
+
+                            int volbaUh = 0;
+                            if (mana >= 3) {
+                                cout << "Chces pouzit 3 many na vyhnuti se utoku od monstra " << j << "? (1 = ano, 0 = ne): ";
+                                cin >> volbaUh;
+                                if (volbaUh == 1) {
+                                    mana -= 3;
+                                    zasah = false;
+                                    cout << "Pouzil jsi 3 many a vyhnul se utoku od monstra " << j << "!" << endl;
+                                }
+                            }
+
+                            if (zasah && Uhyb && rand() % 2 == 0) {
+                                cout << "Povedlo se ti uhnout! " << j << "!" << endl;
+                                zasah = false;
+                            }
+
+                            if (zasah) {
+                                cout << "Monstrum " << j << " te zasahuje." << endl;
+                                zivoty--;
+                            }
+                        }
                     }
 
                     if (zivoty <= 0) {
@@ -131,21 +160,22 @@ int main() {
 
                     cout << "Mas " << zivoty << " zivotu zbyva." << endl;
                 }
+                pocetSouboju++;
+                cout << "Absolvoval jsi " << pocetSouboju << " souboju." << endl;
             }
-
-            bojovyPocet++;
         }
-
 
         cout << "Dorazil jsi do vesnice!" << endl;
         int volbaVesnice = 0;
-        while (volbaVesnice != 5) {
-            cout << "\n--- MENICKO ---" << endl;
+
+        while (volbaVesnice != 6) {
+            cout << "\n--- VESNICKA ---" << endl;
             cout << "1. Vylecit zivoty (2 zlata za 1 zivot)" << endl;
             cout << "2. Zlepsit max zivoty (+15 za 50 zlata)" << endl;
-            cout << "3. Koupit schopnost vyhnout se utoku (50%) - 25 zlata" << endl;
-            cout << "4. Info o statu" << endl;
-            cout << "5. Odejit z vesnice" << endl;
+            cout << "3. Koupit schopnost vyhnout se utoku (50% sance) - 100 zlata" << endl;
+            cout << "4. Koupit manu (1 mana = 3 zlata)" << endl;
+            cout << "5. Info o statu" << endl;
+            cout << "6. Odejit z vesnice" << endl;
             cout << "Zadej volbu: ";
             cin >> volbaVesnice;
 
@@ -157,7 +187,6 @@ int main() {
                     int maxHeal = maxZivoty - zivoty;
                     kolik = min(kolik, maxHeal);
                     int cena = kolik * 2;
-
                     if (zlato >= cena) {
                         zivoty += kolik;
                         zlato -= cena;
@@ -172,38 +201,58 @@ int main() {
                         maxZivoty += 15;
                         zivoty += 15;
                         zlato -= 50;
-                        cout << "Zlepsil jsi max zivoty na " << maxZivoty << endl;
+                        cout << "Zlepsil jsi max zivoty na " << maxZivoty << " a doplnil sis zivoty na " << zivoty << endl;
                     } else {
                         cout << "Nemas dost zlata." << endl;
                     }
                     break;
                 case 3:
-                    if (!Uhyb && zlato >= 25) {
+                    if (!Uhyb && zlato >= 100) {
                         Uhyb = true;
-                        zlato -= 25;
-                        cout << "Mas novou schopnost! 50% sance vyhnout se utoku." << endl;
+                        zlato -= 100;
+                        cout << "Supr! Od ted mas 50% sanci ze se vyhnes utoku od zlobivce." << endl;
                     } else if (Uhyb) {
-                        cout << "Tuto schopnost uz mas." << endl;
+                        cout << "Tuhle schopnost uz mas." << endl;
                     } else {
                         cout << "Nemas dost zlata." << endl;
                     }
                     break;
-                case 4:
-                    cout << "Zivoty: " << zivoty << "/" << maxZivoty << ", Zlato: " << zlato;
+                case 4: {
+                    int kolikMany;
+                    cout << "Kolik many chces koupit? ";
+                    cin >> kolikMany;
+                    int cena = kolikMany * 3;
+                    if (zlato >= cena) {
+                        mana += kolikMany;
+                        zlato -= cena;
+                        cout << "Koupil jsi " << kolikMany << " many. Mas " << mana << " / " << maxMana << endl;
+                    } else {
+                        cout << "Nemas dost zlata." << endl;
+                    }
+                    break;
+                }
+                case 5:
+                    cout << "Zivoty: " << zivoty << "/" << maxZivoty << ", Mana: " << mana << "/" << maxMana << ", Zlato: " << zlato;
                     cout << ", Schopnost uhybu: " << (Uhyb ? "ANO" : "NE") << endl;
                     break;
-                case 5:
+                case 6:
                     cout << "Opoustis vesnici." << endl;
                     break;
                 default:
                     cout << "Neplatna volba." << endl;
             }
         }
+
+        if (pocetSouboju >= 25) {
+            string rozhodnuti;
+            cout << "\nTy brdo, mas za sebou 251 souboju, troufnes si na hlavniho bosse? (ano/ne): ";
+            cin >> rozhodnuti;
+            if (rozhodnuti == "ano") {
+                cout << "bosse delam priste dneska to uz prcam" << endl;
+                break;
+            }
+        }
     }
-
-
-    cout << "Dosahl jsi uz dost zapasu. Ceka te hlavni boss!" << endl;
-    cout << "Uz si myslis ze das bosse a nebo si porad neveris na to (ano/ne): ";
 
     return 0;
 }
