@@ -6,7 +6,6 @@ using namespace std;
 int main() {
     srand(time(0));
 
-    int M, x2M, x3M, MB, HB, V;
     int maxZivoty = 0, zivoty = 0, maxMana = 0, mana = 0, utok = 0;
     int zlato = 0, level = 1, zkusenosti = 0;
     int pocetSouboju = 0;
@@ -165,6 +164,73 @@ int main() {
             }
         }
 
+        // Po každých 25 soubojích možnost jít na bosse
+        if (pocetSouboju >= 25) {
+            string rozhodnuti;
+            cout << "\nMas za sebou " << pocetSouboju << " souboju, chces jit na bosse? (ano/ne): ";
+            cin >> rozhodnuti;
+
+            if (rozhodnuti == "ano") {
+                cout << "Vstupujes do boje s bossem Vextile!" << endl;
+
+                int bossZivoty = 30;
+                int bossUtok = 3;
+                int bossObrana = 1;
+
+                while (zivoty > 0 && bossZivoty > 0) {
+                    cout << "\nMas " << zivoty << " zivotu, boss ma " << bossZivoty << " zivotu." << endl;
+                    cout << "Zadej 1 pro utok na bosse: ";
+                    int volba;
+                    cin >> volba;
+
+                    if (volba == 1) {
+                        int dmg = utok;
+
+                        bool kriticky = (rand() % 100) < 15;
+                        if (kriticky) {
+                            dmg *= 2;
+                            cout << "Kriticky utok!" << endl;
+                        }
+
+                        dmg -= bossObrana;
+                        if (dmg < 0) dmg = 0;
+
+                        bossZivoty -= dmg;
+                        cout << "Uderil jsi bosse za " << dmg << " zraneni." << endl;
+
+                        if (bossZivoty <= 0) {
+                            cout << "GRATULUJU, vyhral si a ted si panem tohoto rajonu!" << endl;
+                            zlato += 100;
+                            pocetSouboju = 0;
+                            break;
+                        }
+                    } else {
+                        cout << "Nevykonal jsi utok, boss se pripravil." << endl;
+                    }
+
+                    int bossDmg = bossUtok;
+                    bool bossKriticky = (rand() % 100) < 10;
+                    if (bossKriticky) {
+                        bossDmg *= 2;
+                        cout << "Boss provedl kriticky utok!" << endl;
+                    }
+
+                    cout << "Boss te zasahl za " << bossDmg << " zraneni." << endl;
+                    zivoty -= bossDmg;
+
+                    if (zivoty <= 0) {
+                        cout << "Zemrel jsi na bosse Vextile. Konec hry." << endl;
+                        return 0;
+                    }
+
+                    cout << "Mas jeste " << zivoty << " zivotu." << endl;
+                }
+            } else {
+                cout << "Pokracujes dal v boji, az do dalsich 25 souboju." << endl;
+                pocetSouboju = 0;
+            }
+        }
+
         cout << "Dorazil jsi do vesnice!" << endl;
         int volbaVesnice = 0;
 
@@ -218,38 +284,35 @@ int main() {
                     }
                     break;
                 case 4: {
-                    int kolikMany;
+                    int kolik;
                     cout << "Kolik many chces koupit? ";
-                    cin >> kolikMany;
-                    int cena = kolikMany * 3;
+                    cin >> kolik;
+                    int cena = kolik * 3;
                     if (zlato >= cena) {
-                        mana += kolikMany;
+                        mana += kolik;
+                        if (mana > maxMana) mana = maxMana;
                         zlato -= cena;
-                        cout << "Koupil jsi " << kolikMany << " many. Mas " << mana << " / " << maxMana << endl;
+                        cout << "Mas ted " << mana << "/" << maxMana << " many." << endl;
                     } else {
                         cout << "Nemas dost zlata." << endl;
                     }
                     break;
                 }
                 case 5:
-                    cout << "Zivoty: " << zivoty << "/" << maxZivoty << ", Mana: " << mana << "/" << maxMana << ", Zlato: " << zlato;
-                    cout << ", Schopnost uhybu: " << (Uhyb ? "ANO" : "NE") << endl;
+                    cout << "Jmeno: " << herniJmeno << endl;
+                    cout << "Zivoty: " << zivoty << "/" << maxZivoty << endl;
+                    cout << "Mana: " << mana << "/" << maxMana << endl;
+                    cout << "Utok: " << utok << endl;
+                    cout << "Zlato: " << zlato << endl;
+                    cout << "Level: " << level << endl;
+                    cout << "Uhyb: " << (Uhyb ? "ano" : "ne") << endl;
                     break;
                 case 6:
-                    cout << "Opoustis vesnici." << endl;
+                    cout << "Odejdes z vesnice a pokracujes v kralovani, dokud to nevypnes, jeste jednou gratuluji." << endl;
                     break;
                 default:
                     cout << "Neplatna volba." << endl;
-            }
-        }
-
-        if (pocetSouboju >= 25) {
-            string rozhodnuti;
-            cout << "\nTy brdo, mas za sebou 251 souboju, troufnes si na hlavniho bosse? (ano/ne): ";
-            cin >> rozhodnuti;
-            if (rozhodnuti == "ano") {
-                cout << "bosse delam priste dneska to uz prcam" << endl;
-                break;
+                    break;
             }
         }
     }
